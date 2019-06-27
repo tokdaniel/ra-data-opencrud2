@@ -363,7 +363,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 
       const inputType = findInputFieldForType(
         introspectionResults,
-        `${resource.type.name}UpdateInput`,
+        `${resource.type.name}CreateInput`,
         key
       );
 
@@ -387,7 +387,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
       if (isObject(params.data[key])) {
         const inputType = findInputFieldForType(
           introspectionResults,
-          `${resource.type.name}UpdateInput`,
+          `${resource.type.name}CreateInput`,
           key
         );
 
