@@ -16,7 +16,9 @@ import {
   PRISMA_CONNECT,
   PRISMA_DISCONNECT,
   PRISMA_UPDATE,
-  PRISMA_CREATE
+  PRISMA_CREATE,
+  PRISMA_DELETE,
+  PRISMA_SET
 } from './constants/mutations';
 import {
   IntrospectionInputObjectType,
@@ -193,6 +195,10 @@ const buildReferenceField = ({
     mutationType
   );
 
+  if (mutationType === PRISMA_CONNECT && Array.isArray(inputArg.id)) {
+    return inputArg.id.map(value => ({ id: value }))
+  }
+
   return Object.keys(inputArg).reduce((acc, key) => {
     return inputFieldExistsForType(
       introspectionResults,
@@ -239,7 +245,7 @@ const buildObjectMutationData = ({
 
   // Else, connect the nodes
   return {
-    [key]: { [mutationType]: { ...fields } }
+    [key]: { [mutationType]: fields }
   };
 };
 
@@ -247,6 +253,109 @@ interface UpdateParams {
   id: string;
   data: { [key: string]: any };
   previousData: { [key: string]: any };
+}
+
+const traverseVariables = (
+  introspectionResults: IntrospectionResult,
+  parentTypeName: String,
+  params: UpdateParams,
+  key: String,
+  acc: any
+) => {
+  const parentInputType = introspectionResults.types.find(t => t.name === parentTypeName)
+
+  if (Array.isArray(params.data[key])) {
+    const previous = params.previousData[key]
+    const current = params.data[key]
+
+    // It must be created if doesnt have id
+    const fieldsToCreate = current.filter(f => !f.id)
+    const fieldsToDelete = previous.map(f => f.id).filter(id => !current.map(c => c.id).includes(id)).map(id => ({ id }))
+    const fieldsToUpdate = current.filter(f => f.id).filter(f => !fieldsToDelete.includes(f.id))
+
+    if (!fieldsToCreate.length && !fieldsToDelete.length && !fieldsToUpdate.length) {
+      const fieldsToConnect = current.filter(f => f.id && Object.keys(f).length === 1)
+
+      return {
+        ...acc,
+        data: {
+          ...acc.data,
+          [key]: {
+            [PRISMA_SET]: fieldsToConnect
+          }
+        }
+      };
+    }
+
+    return {
+      ...acc,
+      data: {
+        ...acc.data,
+        [key]: {
+          [PRISMA_CREATE]: fieldsToCreate.map(field => {
+            const typeName = findInputFieldForType(introspectionResults, parentTypeName, key)
+            const type = introspectionResults.types.find(t => t.name === typeName.name)
+            const createType = type.inputFields.find(t => t.name === PRISMA_CREATE)
+
+            const finalType = getFinalType(createType.type)
+
+            const result = Object.keys(field).reduce(
+              (acc, key) => {
+                return traverseVariables(introspectionResults, finalType.name, {
+                  data: field,
+                  previousData: {}
+                }, key, acc)
+            }, {})
+
+            return result.data
+          }),
+          [PRISMA_UPDATE]: fieldsToUpdate.map(({ id, ...data }) => ({
+            where: { id: id },
+            data
+          })),
+          [PRISMA_DELETE]: fieldsToDelete
+        }
+      }
+    };
+  }
+
+  if (isObject(params.data[key])) {
+    if (parentInputType.kind !== 'SCALAR') {
+      const data = buildObjectMutationData({
+        inputArg: params.data[key],
+        introspectionResults,
+        typeName: parentTypeName,
+        key
+      });
+
+      return {
+        ...acc,
+        data: {
+          ...acc.data,
+          ...data
+        }
+      };
+    }
+  }
+
+  const type = introspectionResults.types.find(
+    t => t.name === parentTypeName
+  ) as IntrospectionObjectType;
+
+  const isInField = type.inputFields.find(t => t.name === key);
+
+  if (!!isInField) {
+    // Rest should be put in data object
+    return {
+      ...acc,
+      data: {
+        ...acc.data,
+        [key]: params.data[key]
+      }
+    };
+  }
+
+  return acc
 }
 
 const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
@@ -265,9 +374,12 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           }
         };
       }
+
+      const typeName = `${resource.type.name}UpdateInput`
+
       const inputType = findInputFieldForType(
         introspectionResults,
-        `${resource.type.name}UpdateInput`,
+        typeName,
         key
       );
 
@@ -275,67 +387,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         return acc;
       }
 
-      if (Array.isArray(params.data[key])) {
-        //TODO: Make connect, disconnect and update overridable
-        //TODO: Make updates working
-        const {
-          fieldsToAdd,
-          fieldsToRemove /* fieldsToUpdate */
-        } = computeFieldsToAddRemoveUpdate(
-          params.previousData[`${key}Ids`],
-          params.data[`${key}Ids`]
-        );
-
-        return {
-          ...acc,
-          data: {
-            ...acc.data,
-            [key]: {
-              [PRISMA_CONNECT]: fieldsToAdd,
-              [PRISMA_DISCONNECT]: fieldsToRemove
-              //[PRISMA_UPDATE]: fieldsToUpdate
-            }
-          }
-        };
-      }
-
-      if (isObject(params.data[key])) {
-        if (inputType.kind !== 'SCALAR') {
-          const typeName = `${resource.type.name}UpdateInput`;
-
-          const data = buildObjectMutationData({
-            inputArg: params.data[key],
-            introspectionResults,
-            typeName,
-            key
-          });
-          return {
-            ...acc,
-            data: {
-              ...acc.data,
-              ...data
-            }
-          };
-        }
-      }
-
-      const type = introspectionResults.types.find(
-        t => t.name === resource.type.name
-      ) as IntrospectionObjectType;
-      const isInField = type.fields.find(t => t.name === key);
-
-      if (!!isInField) {
-        // Rest should be put in data object
-        return {
-          ...acc,
-          data: {
-            ...acc.data,
-            [key]: params.data[key]
-          }
-        };
-      }
-
-      return acc;
+      return traverseVariables(introspectionResults, typeName, params, key, acc);
     },
     {} as { [key: string]: any }
   );
@@ -376,9 +428,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           data: {
             ...acc.data,
             [key]: {
-              [PRISMA_CONNECT]: params.data[`${key}Ids`].map((id: string) => ({
-                id
-              }))
+              [PRISMA_CREATE]: params.data[key]
             }
           }
         };

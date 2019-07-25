@@ -11,7 +11,7 @@ import {
   FieldNode
 } from 'graphql';
 import { QUERY_TYPES } from 'ra-data-graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE } from 'react-admin';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE, GET_ONE } from 'react-admin';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 import * as gqlTypes from './utils/gqlTypes';
@@ -24,7 +24,7 @@ export interface Query {
   args: IntrospectionField[];
 }
 
-export const buildFields = (introspectionResults: IntrospectionResult) => (
+export const buildFields = (introspectionResults: IntrospectionResult, aorFetchType: string) => (
   fields: IntrospectionField[]
 ): FieldNode[] => {
   return fields.reduce(
@@ -43,7 +43,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
         r => r.type.name === type.name
       );
 
-      if (linkedResource) {
+      if (linkedResource && aorFetchType !== GET_LIST && aorFetchType !== GET_ONE) {
         return [
           ...acc,
           gqlTypes.field(gqlTypes.name(field.name), {
@@ -199,7 +199,7 @@ export default (introspectionResults: IntrospectionResult) => (
   const countArgs = buildArgs(queryType, countVariables);
   const fields = !!fragment
     ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
-    : buildFields(introspectionResults)(
+    : buildFields(introspectionResults, aorFetchType)(
         (resource.type as IntrospectionObjectType).fields
       );
 

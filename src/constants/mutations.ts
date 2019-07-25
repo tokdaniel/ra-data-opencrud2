@@ -3,3 +3,4 @@ export const PRISMA_DISCONNECT = 'disconnect';
 export const PRISMA_CREATE = 'create';
 export const PRISMA_DELETE = 'delete';
 export const PRISMA_UPDATE = 'update';
+export const PRISMA_SET = 'set';
