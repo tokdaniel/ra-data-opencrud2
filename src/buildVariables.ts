@@ -262,65 +262,117 @@ const traverseVariables = (
   key: String,
   acc: any
 ) => {
+  // Put id field in a where object
+  if (key === 'id' && params.data[key]) {
+    return {
+      ...acc,
+      where: {
+        id: params.data[key]
+      }
+    };
+  }
+
+  const inputType = findInputFieldForType(
+    introspectionResults,
+    parentTypeName,
+    key
+  );
+
+  if (!inputType) {
+    return acc;
+  }
+
   const parentInputType = introspectionResults.types.find(t => t.name === parentTypeName)
+  const currentInputField = findInputFieldForType(introspectionResults, parentTypeName, key)
+  const currentType = introspectionResults.types.find(t => t.name === currentInputField.name)
 
   if (Array.isArray(params.data[key])) {
-    const previous = params.previousData[key]
+    const previous = (params.previousData || {})[key] || []
     const current = params.data[key]
 
-    // It must be created if doesnt have id
-    const fieldsToCreate = current.filter(f => !f.id)
-    const fieldsToDelete = previous.map(f => f.id).filter(id => !current.map(c => c.id).includes(id)).map(id => ({ id }))
-    const fieldsToUpdate = current.filter(f => f.id).filter(f => !fieldsToDelete.includes(f.id))
+    // Connect data with only ID field
+    const fieldsToConnect = current.filter(f => f.id && Object.keys(f).length === 1)
 
-    if (!fieldsToCreate.length && !fieldsToDelete.length && !fieldsToUpdate.length) {
-      const fieldsToConnect = current.filter(f => f.id && Object.keys(f).length === 1)
+    if (fieldsToConnect.length) {
+      const operation = currentType.inputFields.find(f => f.name === 'set') ? PRISMA_SET : PRISMA_CONNECT;
 
       return {
         ...acc,
         data: {
           ...acc.data,
           [key]: {
-            [PRISMA_SET]: fieldsToConnect
+            [operation]: fieldsToConnect
           }
         }
       };
+    }
+
+    const operations = {}
+
+    // It must be created if doesnt have id
+    const fieldsToCreate = current.filter(f => !f.id)
+    const fieldsToDelete = previous.map(f => f.id).filter(id => !current.map(c => c.id).includes(id)).map(id => ({ id }))
+    const fieldsToUpdate = current.filter(f => f.id).filter(f => !fieldsToDelete.includes(f.id))
+
+
+    const hasCreateOperation = currentType.inputFields.find(f => f.name === PRISMA_CREATE);
+
+    if (hasCreateOperation) {
+      operations[PRISMA_CREATE] = fieldsToCreate.map(field => {
+        const createType = currentType.inputFields.find(t => t.name === PRISMA_CREATE)
+        const finalType = getFinalType(createType.type)
+
+        return Object.keys(field).reduce((acc, key) => traverseVariables(introspectionResults, finalType.name, {
+          data: field,
+          previousData: {}
+        }, key, acc), {}).data
+      })
+    }
+
+
+    const hasUpdateOperation = currentType.inputFields.find(f => f.name === PRISMA_UPDATE);
+
+    if (hasUpdateOperation) {
+      operations[PRISMA_UPDATE] = fieldsToUpdate.map(field => {
+        const updateType = currentType.inputFields.find(t => t.name === PRISMA_UPDATE)
+        const finalUpdateType = getFinalType(updateType.type)
+
+        const dataType = introspectionResults.types.find(t => t.name === finalUpdateType.name).inputFields.find(i => i.name === "data")
+        const finalDataType = getFinalType(dataType.type)
+
+        const result = Object.keys(field).reduce(
+          (acc, key) => traverseVariables(introspectionResults, finalDataType.name, {
+            data: field,
+            previousData: {}
+          }, key, acc), {})
+
+        return result
+      })
+    }
+
+    const hasDeleteOperation = currentType.inputFields.find(f => f.name === PRISMA_DELETE);
+
+    if (hasDeleteOperation) {
+      operations[PRISMA_DELETE] = fieldsToDelete
     }
 
     return {
       ...acc,
       data: {
         ...acc.data,
-        [key]: {
-          [PRISMA_CREATE]: fieldsToCreate.map(field => {
-            const typeName = findInputFieldForType(introspectionResults, parentTypeName, key)
-            const type = introspectionResults.types.find(t => t.name === typeName.name)
-            const createType = type.inputFields.find(t => t.name === PRISMA_CREATE)
-
-            const finalType = getFinalType(createType.type)
-
-            const result = Object.keys(field).reduce(
-              (acc, key) => {
-                return traverseVariables(introspectionResults, finalType.name, {
-                  data: field,
-                  previousData: {}
-                }, key, acc)
-            }, {})
-
-            return result.data
-          }),
-          [PRISMA_UPDATE]: fieldsToUpdate.map(({ id, ...data }) => ({
-            where: { id: id },
-            data
-          })),
-          [PRISMA_DELETE]: fieldsToDelete
-        }
+        [key]: operations
       }
     };
   }
 
   if (isObject(params.data[key])) {
-    if (parentInputType.kind !== 'SCALAR') {
+    const inputType = findInputFieldForType(
+      introspectionResults,
+      parentInputType.name,
+      key
+    );
+
+    if (inputType.kind !== 'SCALAR') {
       const data = buildObjectMutationData({
         inputArg: params.data[key],
         introspectionResults,
@@ -363,32 +415,10 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   aorFetchType: String,
   params: UpdateParams
 ) => {
+  const typeName = `${resource.type.name}UpdateInput`
+
   return Object.keys(params.data).reduce(
-    (acc, key) => {
-      // Put id field in a where object
-      if (key === 'id' && params.data[key]) {
-        return {
-          ...acc,
-          where: {
-            id: params.data[key]
-          }
-        };
-      }
-
-      const typeName = `${resource.type.name}UpdateInput`
-
-      const inputType = findInputFieldForType(
-        introspectionResults,
-        typeName,
-        key
-      );
-
-      if (!inputType) {
-        return acc;
-      }
-
-      return traverseVariables(introspectionResults, typeName, params, key, acc);
-    },
+    (acc, key) => traverseVariables(introspectionResults, typeName, params, key, acc),
     {} as { [key: string]: any }
   );
 };
@@ -400,89 +430,14 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
   params: CreateParams
-) =>
-  Object.keys(params.data).reduce(
-    (acc, key) => {
-      // Put id field in a where object
-      if (key === 'id' && params.data[key]) {
-        return {
-          ...acc,
-          where: {
-            id: params.data[key]
-          }
-        };
-      }
+) => {
+  const typeName = `${resource.type.name}CreateInput`
 
-      const inputType = findInputFieldForType(
-        introspectionResults,
-        `${resource.type.name}CreateInput`,
-        key
-      );
-
-      if (!inputType) {
-        return acc;
-      }
-      if (Array.isArray(params.data[key])) {
-        return {
-          ...acc,
-          data: {
-            ...acc.data,
-            [key]: {
-              [PRISMA_CREATE]: params.data[key]
-            }
-          }
-        };
-      }
-
-      if (isObject(params.data[key])) {
-        const inputType = findInputFieldForType(
-          introspectionResults,
-          `${resource.type.name}CreateInput`,
-          key
-        );
-
-        if (!inputType) {
-          return acc;
-        }
-
-        if (inputType.kind !== 'SCALAR') {
-          const typeName = `${resource.type.name}CreateInput`;
-          const data = buildObjectMutationData({
-            inputArg: params.data[key],
-            introspectionResults,
-            typeName,
-            key
-          });
-          return {
-            ...acc,
-            data: {
-              ...acc.data,
-              ...data
-            }
-          };
-        }
-      }
-
-      const type = introspectionResults.types.find(
-        t => t.name === resource.type.name
-      ) as IntrospectionObjectType;
-      const isInField = type.fields.find(t => t.name === key);
-
-      if (isInField) {
-        // Rest should be put in data object
-        return {
-          ...acc,
-          data: {
-            ...acc.data,
-            [key]: params.data[key]
-          }
-        };
-      }
-
-      return acc;
-    },
+  return Object.keys(params.data).reduce(
+    (acc, key) => traverseVariables(introspectionResults, typeName, params, key, acc),
     {} as { [key: string]: any }
-  );
+  )
+};
 
 export default (introspectionResults: IntrospectionResult) => (
   resource: Resource,
