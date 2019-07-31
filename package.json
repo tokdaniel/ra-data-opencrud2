@@ -1,19 +1,20 @@
 {
-  "name": "ra-data-opencrud",
-  "version": "0.0.8",
+  "name": "ra-data-opencrud2",
+  "version": "0.0.9",
   "description": "A Prisma/GraphCMS data provider for react-admin",
   "main": "dist/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/weakky/ra-data-opencrud.git"
+    "url": "git+https://github.com/hajnalben/ra-data-opencrud.git"
   },
   "bugs": {
-    "url": "https://github.com/weakky/ra-data-opencrud/issues"
+    "url": "https://github.com/hajnalben/ra-data-opencrud/issues"
   },
-  "homepage": "https://github.com/weakky/ra-data-opencrud#readme",
+  "homepage": "https://github.com/hajnalben/ra-data-opencrud#readme",
   "authors": [
-    "Flavian DESVERNE"
+    "Flavian DESVERNE",
+    "Benjamin Hajnal"
   ],
   "keywords": [
     "reactjs",
