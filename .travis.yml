@@ -11,6 +11,6 @@ deploy:
   - provider: npm
     skip_cleanup: true
     email: 'hajnalbenjamin@gmail.com'
-    api_key: $NPM_TOKEN
+    api_key: NPM_TOKEN
     on:
       tags: true
