@@ -24,7 +24,7 @@ export interface Query {
   args: IntrospectionField[];
 }
 
-export const buildFields = (introspectionResults: IntrospectionResult, aorFetchType: string) => (
+export const buildFields = (introspectionResults: IntrospectionResult, aorFetchType?: string) => (
   fields: IntrospectionField[]
 ): FieldNode[] => {
   return fields.reduce(
@@ -56,16 +56,14 @@ export const buildFields = (introspectionResults: IntrospectionResult, aorFetchT
 
       const linkedType = introspectionResults.types.find(
         t => t.name === type.name
-      );
+      ) as IntrospectionObjectType;
 
       if (linkedType) {
         return [
           ...acc,
           gqlTypes.field(gqlTypes.name(field.name), {
             selectionSet: gqlTypes.selectionSet(
-              buildFields(introspectionResults)(
-                (linkedType as IntrospectionObjectType).fields
-              )
+              buildFields(introspectionResults)(linkedType.fields as IntrospectionField[])
             )
           })
         ];
@@ -177,7 +175,7 @@ const buildFieldsFromFragment = (
     } catch (e) {
       throw new Error(
         `Invalid fragment given for resource '${resourceName}' and fetchType '${fetchType}' (${
-          e.message
+        e.message
         }).`
       );
     }
@@ -200,8 +198,8 @@ export default (introspectionResults: IntrospectionResult) => (
   const fields = !!fragment
     ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
     : buildFields(introspectionResults, aorFetchType)(
-        (resource.type as IntrospectionObjectType).fields
-      );
+      (resource.type as IntrospectionObjectType).fields as IntrospectionField[]
+    );
 
   if (
     aorFetchType === GET_LIST ||

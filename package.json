@@ -32,19 +32,20 @@
   },
   "dependencies": {
     "graphql-tag": "^2.6.1",
-    "lodash": "~4.17.5",
+    "lodash": "^4.17.15",
     "pluralize": "^7.0.0",
     "ra-data-graphql": "^2.3.0"
   },
   "peerDependencies": {
     "graphql": "^0.13.2",
-    "react-admin": "^2.3.0"
+    "react-admin": "^2.3.0",
+    "apollo-client": "^2.6.3"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.2",
-    "@types/lodash": "^4.14.116",
-    "@types/pluralize": "^0.0.29",
-    "apollo-client": "^2.4.2",
+    "@types/graphql": "^14.2.3",
+    "@types/jest": "^23.3.14",
+    "@types/lodash": "^4.14.136",
+    "@types/pluralize": "0.0.29",
     "babel-cli": "~6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.7.0",
