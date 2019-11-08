@@ -229,10 +229,38 @@ const buildObjectMutationData = ({
     PRISMA_CONNECT
   );
 
-  const mutationType = hasConnect ? PRISMA_CONNECT : PRISMA_CREATE;
+  const hasCreate = hasMutationInputType(
+    introspectionResults,
+    typeName,
+    key,
+    PRISMA_CREATE
+  );
 
-  const fields = buildReferenceField({
-    inputArg,
+  const hasUpdate = hasMutationInputType(
+    introspectionResults,
+    typeName,
+    key,
+    PRISMA_UPDATE
+  );
+
+  const hasId = !!inputArg.id
+  const hasAdditionalFields = Object.keys(inputArg).some(field => field !== 'id')
+
+  // Has id but doesnt have any additional fields
+  const isConnect = hasConnect && hasId && !hasAdditionalFields
+  // Has id and additional fields
+  const isUpdate = hasUpdate && hasId && hasAdditionalFields
+  // Has additional fields but not id
+  const isCreate = hasCreate && !hasId && hasAdditionalFields
+
+  const mutationType =
+    [PRISMA_CONNECT, PRISMA_UPDATE, PRISMA_CREATE]
+    [[isConnect, isUpdate, isCreate].indexOf(true)];
+
+  const { id, ...otherArgs } = inputArg
+
+  let fields = buildReferenceField({
+    inputArg: isUpdate ? otherArgs : inputArg,
     introspectionResults,
     typeName,
     field: key,
