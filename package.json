@@ -1,6 +1,6 @@
 {
   "name": "ra-data-opencrud2",
-  "version": "0.0.9",
+  "version": "0.0.91",
   "description": "A Prisma/GraphCMS data provider for react-admin",
   "main": "dist/index.js",
   "sideEffects": false,
