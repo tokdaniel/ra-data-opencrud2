@@ -257,6 +257,10 @@ const buildObjectMutationData = ({
     [PRISMA_CONNECT, PRISMA_UPDATE, PRISMA_CREATE]
     [[isConnect, isUpdate, isCreate].indexOf(true)];
 
+  if (!mutationType) {
+    return {}
+  }
+
   const { id, ...otherArgs } = inputArg
 
   let fields = buildReferenceField({
