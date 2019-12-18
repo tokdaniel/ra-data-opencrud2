@@ -6,7 +6,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'react-admin';
+} from 'ra-core/lib/dataFetchActions';
 import isObject from 'lodash/isObject';
 
 import getFinalType from './utils/getFinalType';
@@ -55,7 +55,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
       if (!!inputField) {
         return {
           ...acc,
-          [key]: { id_in: params.filter[key] }
+          [key]: params.filter[key]
         };
       }
     }
@@ -179,19 +179,21 @@ const hasMutationInputType = (
 const buildReferenceField = ({
   inputArg,
   introspectionResults,
+  parentTypeName,
   typeName,
   field,
   mutationType
 }: {
   inputArg: { [key: string]: any };
   introspectionResults: IntrospectionResult;
+  parentTypeName: string;
   typeName: string;
   field: string;
   mutationType: string;
 }) => {
   const mutationInputType = findMutationInputType(
     introspectionResults,
-    typeName,
+    parentTypeName,
     field,
     mutationType
   );
@@ -201,6 +203,13 @@ const buildReferenceField = ({
   }
 
   return Object.keys(inputArg).reduce((acc, key) => {
+    // const currentInputField = findInputFieldForType(
+    //   introspectionResults,
+    //   typeName,
+    //   mutationType
+    // );
+
+    // return traverseVariables(introspectionResults, currentInputField.name, { data: inputArg }, key, acc)
     return inputFieldExistsForType(
       introspectionResults,
       mutationInputType!.name,
@@ -214,31 +223,33 @@ const buildReferenceField = ({
 const buildObjectMutationData = ({
   inputArg,
   introspectionResults,
+  parentTypeName,
   typeName,
   key
 }: {
   inputArg: { [key: string]: any };
   introspectionResults: IntrospectionResult;
+  parentTypeName: string;
   typeName: string;
   key: string;
 }) => {
   const hasConnect = hasMutationInputType(
     introspectionResults,
-    typeName,
+    parentTypeName,
     key,
     PRISMA_CONNECT
   );
 
   const hasCreate = hasMutationInputType(
     introspectionResults,
-    typeName,
+    parentTypeName,
     key,
     PRISMA_CREATE
   );
 
   const hasUpdate = hasMutationInputType(
     introspectionResults,
-    typeName,
+    parentTypeName,
     key,
     PRISMA_UPDATE
   );
@@ -266,6 +277,7 @@ const buildObjectMutationData = ({
   let fields = buildReferenceField({
     inputArg: isUpdate ? otherArgs : inputArg,
     introspectionResults,
+    parentTypeName,
     typeName,
     field: key,
     mutationType
@@ -295,6 +307,7 @@ interface Operations {
   [PRISMA_DELETE]?: any
   [PRISMA_SET]?: any
   [PRISMA_UPDATE]?: any
+  [PRISMA_DISCONNECT]?: any
 }
 
 const traverseVariables = (
@@ -321,14 +334,27 @@ const traverseVariables = (
   );
 
   if (!currentInputField) {
+    console.warn(`Field (${key}) not found on type ${parentTypeName}`)
+
     return acc;
   }
 
   const parentInputType = introspectionResults.types.find(t => t.name === parentTypeName) as IntrospectionInputObjectType
   const currentType = introspectionResults.types.find(t => t.name === currentInputField.name) as IntrospectionInputObjectType
 
+  if (currentInputField.kind === 'SCALAR' || currentInputField.kind === 'ENUM') {
+    return {
+      ...acc,
+      data: {
+        ...acc.data,
+        [key]: params.data[key]
+      }
+    };
+  }
+
+
   if (Array.isArray(params.data[key])) {
-    const previous = (params.previousData[key] || []) as Array<Params>
+    const previous = ((params.previousData || {})[key] || []) as Array<Params>
     const current = params.data[key] as Array<Params>
 
     // Connect data with only ID field
@@ -390,9 +416,17 @@ const traverseVariables = (
     }
 
     const hasDeleteOperation = currentType.inputFields.some(f => f.name === PRISMA_DELETE);
+    const hasDisconnectOperation = currentType.inputFields.some(f => f.name === PRISMA_DISCONNECT);
+
+    if (fieldsToDelete.length && hasDeleteOperation && hasDisconnectOperation) {
+      console.error('Both delete and disconnect operations exist for type: ' + currentType.name)
+    }
 
     if (hasDeleteOperation) {
       operations[PRISMA_DELETE] = fieldsToDelete
+    }
+    else if (hasDisconnectOperation) {
+      operations[PRISMA_DISCONNECT] = fieldsToDelete
     }
 
     return {
@@ -405,33 +439,19 @@ const traverseVariables = (
   }
 
   if (isObject(params.data[key])) {
-    if (currentInputField.kind !== 'SCALAR') {
-      const data = buildObjectMutationData({
-        inputArg: params.data[key],
-        introspectionResults,
-        typeName: parentTypeName,
-        key
-      });
+    const data = buildObjectMutationData({
+      inputArg: params.data[key],
+      introspectionResults,
+      parentTypeName,
+      typeName: currentInputField.name,
+      key
+    });
 
-      return {
-        ...acc,
-        data: {
-          ...acc.data,
-          ...data
-        }
-      };
-    }
-  }
-
-  const isInField = parentInputType.inputFields.some(t => t.name === key);
-
-  if (isInField) {
-    // Rest should be put in data object
     return {
       ...acc,
       data: {
         ...acc.data,
-        [key]: params.data[key]
+        ...data
       }
     };
   }

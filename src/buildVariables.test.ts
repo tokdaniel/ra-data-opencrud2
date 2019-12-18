@@ -5,7 +5,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'react-admin';
+} from 'ra-core/lib/dataFetchActions';
 import buildVariables from './buildVariables';
 import { TypeKind } from 'graphql/type/introspection';
 import { IntrospectionResult, Resource } from './constants/interfaces';
@@ -34,7 +34,7 @@ describe('buildVariables', () => {
       };
 
       expect(
-        buildVariables(introspectionResult as IntrospectionResult)(
+        buildVariables(introspectionResult as unknown as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           GET_LIST,
           params
@@ -86,6 +86,16 @@ describe('buildVariables', () => {
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
                     name: 'TagCreateManyInput'
+                  }
+                }
+              },
+              {
+                name: 'title',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.SCALAR,
+                    name: 'String'
                   }
                 }
               }
@@ -162,7 +172,7 @@ describe('buildVariables', () => {
       };
 
       expect(
-        buildVariables(introspectionResult as IntrospectionResult)(
+        buildVariables(introspectionResult as unknown as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           CREATE,
           params
@@ -289,7 +299,7 @@ describe('buildVariables', () => {
       };
 
       expect(
-        buildVariables(introspectionResult as IntrospectionResult)(
+        buildVariables(introspectionResult as unknown as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           UPDATE,
           params

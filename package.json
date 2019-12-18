@@ -1,6 +1,6 @@
 {
   "name": "ra-data-opencrud2",
-  "version": "0.0.92",
+  "version": "0.0.97",
   "description": "A Prisma/GraphCMS data provider for react-admin",
   "main": "dist/index.js",
   "sideEffects": false,
@@ -29,12 +29,14 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "test": "jest",
+    "watch": "tsc --watch",
+    "prepublish": "tsc"
   },
   "dependencies": {
-    "graphql-tag": "^2.6.1",
+    "graphql-tag": "^2.10.1",
     "lodash": "^4.17.15",
-    "pluralize": "^7.0.0",
+    "pluralize": "^8.0.0",
     "ra-data-graphql": "^2.3.0"
   },
   "peerDependencies": {
@@ -47,14 +49,8 @@
     "@types/jest": "^23.3.14",
     "@types/lodash": "^4.14.136",
     "@types/pluralize": "0.0.29",
-    "babel-cli": "~6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "cross-env": "^5.2.0",
-    "graphql": "^0.13.2",
-    "jest": "^23.6.0",
-    "react-admin": "^2.3.0",
-    "rimraf": "^2.6.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.2.0",
     "typescript": "^3.0.3"
   }
 }

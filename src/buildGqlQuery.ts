@@ -10,8 +10,8 @@ import {
   ArgumentNode,
   FieldNode
 } from 'graphql';
-import { QUERY_TYPES } from 'ra-data-graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE, GET_ONE } from 'react-admin';
+import { QUERY_TYPES } from './constants/contants';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE, GET_ONE } from 'ra-core/lib/dataFetchActions';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 import * as gqlTypes from './utils/gqlTypes';

@@ -6,7 +6,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'react-admin';
+} from 'ra-core/lib/dataFetchActions';
 import getResponseParser from './getResponseParser';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
@@ -112,9 +112,9 @@ const testListTypes = (type: string) => {
     };
 
     expect(
-      getResponseParser(introspectionResults as IntrospectionResult)(
+      getResponseParser(introspectionResults as unknown as IntrospectionResult)(
         type,
-        resource as Resource
+        resource as unknown as Resource
       )(response)
     ).toEqual({
       data: [
@@ -234,9 +234,9 @@ const testSingleTypes = (type: string) => {
       }
     };
     expect(
-      getResponseParser(introspectionResults as IntrospectionResult)(
+      getResponseParser(introspectionResults as unknown as IntrospectionResult)(
         type,
-        resource as Resource
+        resource as unknown as Resource
       )(response)
     ).toEqual({
       data: {

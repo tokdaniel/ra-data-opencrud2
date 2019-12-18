@@ -1,5 +1,5 @@
 import { TypeKind, IntrospectionObjectType } from 'graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'react-admin';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'ra-core/lib/dataFetchActions';
 import getFinalType from './utils/getFinalType';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
@@ -48,8 +48,8 @@ const sanitizeResource = (
           : undefined,
         [field.name]: linkedResourceData
           ? sanitizeResource(introspectionResults, linkedResource)(
-              data[field.name]
-            )
+            data[field.name]
+          )
           : undefined
       };
     }

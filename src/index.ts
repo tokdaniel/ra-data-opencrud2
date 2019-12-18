@@ -13,7 +13,7 @@ import {
   GET_ONE,
   UPDATE,
   UPDATE_MANY
-} from 'react-admin';
+} from 'ra-core/lib/dataFetchActions';
 
 import prismaBuildQuery from './buildQuery';
 import { Resource } from './constants/interfaces';
