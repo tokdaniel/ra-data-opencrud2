@@ -21,20 +21,14 @@ export const buildQueryFactory = () => (
 
     if (!resource) {
       throw new Error(
-        `Unknown resource ${resourceName}. Make sure it has been declared on your server side schema. Known resources are ${knownResources.join(
-          ', '
-        )}`
+        `Unknown resource ${resourceName}. Make sure it has been declared on your server side schema. Known resources are: ${knownResources.join(', \n')}`
       );
     }
 
     const queryType = resource[aorFetchType];
 
     if (!queryType) {
-      throw new Error(
-        `No query or mutation matching aor fetch type ${aorFetchType} could be found for resource ${
-          resource.type.name
-        }`
-      );
+      throw new Error(`No query or mutation matching aor fetch type ${aorFetchType} could be found for resource ${resource.type.name}`);
     }
 
     const variables = buildVariables(introspectionResults)(
@@ -42,6 +36,9 @@ export const buildQueryFactory = () => (
       aorFetchType,
       params
     )!;
+
+    console.log(aorFetchType, resourceName, params, ' -> ', variables)
+
     const query = buildGqlQuery(introspectionResults)(
       resource,
       aorFetchType,
@@ -49,6 +46,7 @@ export const buildQueryFactory = () => (
       variables,
       fragment
     );
+
     const parseResponse = getResponseParser(introspectionResults)(
       aorFetchType,
       resource

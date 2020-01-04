@@ -178,6 +178,7 @@ const hasMutationInputType = (
 
 const buildReferenceField = ({
   inputArg,
+  previousInputArg,
   introspectionResults,
   parentTypeName,
   typeName,
@@ -185,6 +186,7 @@ const buildReferenceField = ({
   mutationType
 }: {
   inputArg: { [key: string]: any };
+  previousInputArg: { [key: string]: any };
   introspectionResults: IntrospectionResult;
   parentTypeName: string;
   typeName: string;
@@ -198,41 +200,70 @@ const buildReferenceField = ({
     mutationType
   );
 
-  if (mutationType === PRISMA_CONNECT && Array.isArray(inputArg.id)) {
-    return inputArg.id.map(value => ({ id: value }))
+  if (mutationType === PRISMA_CONNECT) {
+    const idOrIds = inputArg.id
+
+    if (Array.isArray(idOrIds)) {
+      return idOrIds.map(value => ({ id: value }))
+    }
+
+    return { id: idOrIds }
   }
 
-  return Object.keys(inputArg).reduce((acc, key) => {
-    // const currentInputField = findInputFieldForType(
-    //   introspectionResults,
-    //   typeName,
-    //   mutationType
-    // );
-
-    // return traverseVariables(introspectionResults, currentInputField.name, { data: inputArg }, key, acc)
-    return inputFieldExistsForType(
+  const { where, data } = Object.keys(inputArg).reduce((acc, key) => {
+    const currentInputField = findInputFieldForType(
       introspectionResults,
-      mutationInputType!.name,
-      key
+      typeName,
+      mutationType
+    )!;
+
+    return traverseVariables(
+      introspectionResults,
+      currentInputField.name,
+      {
+        data: inputArg,
+        previousData: previousInputArg
+      },
+      key,
+      acc
     )
-      ? { ...acc, [key]: inputArg[key] }
-      : acc;
-  }, {});
+  }, {}) as {
+    where: Params;
+    data: Params;
+  };
+
+  // Relation 'create' will not have 'data' child. Example: (owner-create)
+  // createFile(data: {
+  //   owner: {
+  //     create: {
+  //       id
+  //     }
+  //   }
+  // })
+  if (mutationType === PRISMA_CREATE) {
+    return data
+  }
+
+  return { where, data }
 };
 
 const buildObjectMutationData = ({
   inputArg,
+  previousInputArg,
   introspectionResults,
   parentTypeName,
   typeName,
   key
 }: {
   inputArg: { [key: string]: any };
+  previousInputArg: { [key: string]: any };
   introspectionResults: IntrospectionResult;
   parentTypeName: string;
   typeName: string;
   key: string;
 }) => {
+  // TODO: Handle delete
+
   const hasConnect = hasMutationInputType(
     introspectionResults,
     parentTypeName,
@@ -276,6 +307,7 @@ const buildObjectMutationData = ({
 
   let fields = buildReferenceField({
     inputArg: isUpdate ? otherArgs : inputArg,
+    previousInputArg,
     introspectionResults,
     parentTypeName,
     typeName,
@@ -352,7 +384,6 @@ const traverseVariables = (
     };
   }
 
-
   if (Array.isArray(params.data[key])) {
     const previous = ((params.previousData || {})[key] || []) as Array<Params>
     const current = params.data[key] as Array<Params>
@@ -376,10 +407,15 @@ const traverseVariables = (
 
     const operations: Operations = {}
 
+    const currentIds = current.map(c => c.id)
+
     // It must be created if doesnt have id
     const fieldsToCreate = current.filter(f => !f.id)
-    const fieldsToDelete = previous.map(f => f.id).filter(id => !current.map(c => c.id).includes(id)).map(id => ({ id }))
-    const fieldsToUpdate = current.filter(f => f.id).filter(f => !fieldsToDelete.includes(f.id))
+    const fieldsToDelete = previous.map(f => f.id)
+      .filter(id => !currentIds.includes(id))
+      .map(id => ({ id }))
+    const fieldsToUpdate = current.filter(f => f.id)
+      .filter(f => !fieldsToDelete.includes(f.id))
 
 
     const createType = currentType.inputFields.find(t => t.name === PRISMA_CREATE)
@@ -407,10 +443,10 @@ const traverseVariables = (
 
       const finalDataType = getFinalType(dataType.type)
 
-      operations[PRISMA_UPDATE] = fieldsToUpdate.map(field => Object.keys(field).reduce(
+      operations[PRISMA_UPDATE] = fieldsToUpdate.map(item => Object.keys(item).reduce(
         (acc, key) => traverseVariables(introspectionResults, finalDataType.name, {
-          data: field,
-          previousData: {} // TODO: Add previous data
+          data: item,
+          previousData: previous.find(f => f.id === item.id) || {}
         }, key, acc), {} as Params)
       )
     }
@@ -441,6 +477,7 @@ const traverseVariables = (
   if (isObject(params.data[key])) {
     const data = buildObjectMutationData({
       inputArg: params.data[key],
+      previousInputArg: params.previousData[key] || {},
       introspectionResults,
       parentTypeName,
       typeName: currentInputField.name,
@@ -475,6 +512,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
 interface CreateParams {
   data: Params;
 }
+
 const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
