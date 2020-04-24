@@ -13,7 +13,7 @@ import {
   GET_ONE,
   UPDATE,
   UPDATE_MANY
-} from 'ra-core/lib/dataFetchActions';
+} from 'ra-core/lib/core/dataFetchActions';
 
 import prismaBuildQuery from './buildQuery';
 import { Resource } from './constants/interfaces';

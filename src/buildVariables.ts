@@ -9,7 +9,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'ra-core/lib/dataFetchActions';
+} from 'ra-core/lib/core/dataFetchActions';
 import {
   PRISMA_CONNECT,
   PRISMA_DISCONNECT,

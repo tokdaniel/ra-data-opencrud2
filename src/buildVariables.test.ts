@@ -5,7 +5,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'ra-core/lib/dataFetchActions';
+} from 'ra-core/lib/core/dataFetchActions';
 import buildVariables from './buildVariables';
 import { TypeKind } from 'graphql/type/introspection';
 import { IntrospectionResult, Resource } from './constants/interfaces';

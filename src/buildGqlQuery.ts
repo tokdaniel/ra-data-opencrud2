@@ -11,7 +11,7 @@ import {
   FieldNode
 } from 'graphql';
 import { QUERY_TYPES } from './constants/contants';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE, GET_ONE } from 'ra-core/lib/dataFetchActions';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE, GET_ONE } from 'ra-core/lib/core/dataFetchActions';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 import * as gqlTypes from './utils/gqlTypes';

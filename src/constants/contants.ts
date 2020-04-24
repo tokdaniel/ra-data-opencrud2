@@ -8,7 +8,7 @@ import {
   UPDATE_MANY,
   DELETE,
   DELETE_MANY,
-} from 'ra-core/lib/dataFetchActions';
+} from 'ra-core/lib/core/dataFetchActions';
 
 export const QUERY_TYPES = [GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE];
 export const MUTATION_TYPES = [
