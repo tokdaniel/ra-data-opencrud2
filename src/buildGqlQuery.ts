@@ -189,7 +189,7 @@ export default (introspectionResults: IntrospectionResult) => (
   aorFetchType: string,
   queryType: Query,
   variables: { [key: string]: any },
-  fragment: DocumentNode
+  fragment?: DocumentNode
 ) => {
   const { orderBy, skip, first, ...countVariables } = variables;
   const apolloArgs = buildApolloArgs(queryType, variables);

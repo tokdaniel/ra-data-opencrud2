@@ -1,3 +1,6 @@
+import isObject from 'lodash/isObject';
+import getFinalType from './utils/getFinalType';
+import { IntrospectionResult, Resource } from './constants/interfaces';
 import {
   GET_LIST,
   GET_ONE,
@@ -7,11 +10,6 @@ import {
   UPDATE,
   DELETE
 } from 'ra-core/lib/dataFetchActions';
-import isObject from 'lodash/isObject';
-
-import getFinalType from './utils/getFinalType';
-import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
-
 import {
   PRISMA_CONNECT,
   PRISMA_DISCONNECT,
@@ -27,7 +25,6 @@ import {
   IntrospectionNamedTypeRef,
   IntrospectionInputValue
 } from 'graphql';
-import { IntrospectionResult, Resource } from './constants/interfaces';
 
 interface GetListParams {
   filter: { [key: string]: any };
@@ -121,14 +118,28 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
   };
 };
 
+const findInputObjectType = (
+  introspectionResults: IntrospectionResult,
+  typeName: string,
+  key?: string
+) => {
+  const type = introspectionResults.types.find(
+    t => t.name === typeName
+  ) as IntrospectionInputObjectType | undefined;
+
+  if (!key || !type) {
+    return type
+  }
+
+  return type.inputFields.find(t => t.name === key) as IntrospectionInputObjectType | undefined;
+}
+
 const findInputFieldForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
   field: string
 ) => {
-  const type = introspectionResults.types.find(
-    t => t.name === typeName
-  ) as IntrospectionInputObjectType;
+  const type = findInputObjectType(introspectionResults, typeName)
 
   if (!type) {
     return null;
@@ -136,15 +147,11 @@ const findInputFieldForType = (
 
   const inputFieldType = type.inputFields.find(t => t.name === field);
 
-  return !!inputFieldType ? getFinalType(inputFieldType.type) : null;
-};
+  if (!inputFieldType) {
+    return null
+  }
 
-const inputFieldExistsForType = (
-  introspectionResults: IntrospectionResult,
-  typeName: string,
-  field: string
-): boolean => {
-  return !!findInputFieldForType(introspectionResults, typeName, field);
+  return getFinalType(inputFieldType.type)
 };
 
 const findMutationInputType = (
@@ -158,6 +165,7 @@ const findMutationInputType = (
     typeName,
     field
   );
+
   return findInputFieldForType(
     introspectionResults,
     inputType!.name,
@@ -200,6 +208,8 @@ const buildReferenceField = ({
     mutationType
   );
 
+  const inputObjectType = findInputObjectType(introspectionResults, typeName, field) as IntrospectionInputObjectType
+
   if (mutationType === PRISMA_CONNECT) {
     const idOrIds = inputArg.id
 
@@ -210,13 +220,13 @@ const buildReferenceField = ({
     return { id: idOrIds }
   }
 
-  const { where, data } = Object.keys(inputArg).reduce((acc, key) => {
-    const currentInputField = findInputFieldForType(
-      introspectionResults,
-      typeName,
-      mutationType
-    )!;
+  const currentInputField = findInputFieldForType(
+    introspectionResults,
+    typeName,
+    mutationType
+  )!;
 
+  const { where, data } = Object.keys(inputArg).reduce((acc, key) => {
     return traverseVariables(
       introspectionResults,
       currentInputField.name,
@@ -241,6 +251,14 @@ const buildReferenceField = ({
   //   }
   // })
   if (mutationType === PRISMA_CREATE) {
+    return data
+  }
+
+  if (!findInputFieldForType(
+    introspectionResults,
+    currentInputField.name,
+    "where"
+  )) {
     return data
   }
 
@@ -285,11 +303,45 @@ const buildObjectMutationData = ({
     PRISMA_UPDATE
   );
 
+  const hasDelete = hasMutationInputType(
+    introspectionResults,
+    parentTypeName,
+    key,
+    PRISMA_DELETE
+  );
+
+  const hasDisconnect = hasMutationInputType(
+    introspectionResults,
+    parentTypeName,
+    key,
+    PRISMA_DISCONNECT
+  );
+
   const hasId = !!inputArg.id
+  const hadId = !!previousInputArg.id
+
+  // We should delete/disconnect in case of empty id based on the previous data
+  if (!hasId && hadId) {
+    // Prefer disconnect over delete
+    const mutationType = hasDisconnect ? PRISMA_DISCONNECT : hasDelete ? PRISMA_DELETE : null
+
+    if (!mutationType) {
+      return {}
+    }
+
+    return {
+      [key]: {
+        [mutationType]: {
+          id: previousInputArg.id
+        }
+      }
+    };
+  }
+
   const hasAdditionalFields = Object.keys(inputArg).some(field => field !== 'id')
 
   // Has id but doesnt have any additional fields
-  const isConnect = hasConnect && hasId && !hasAdditionalFields
+  const isConnect = hasConnect && hasId && (!hasAdditionalFields || (!hasCreate && !hasUpdate))
   // Has id and additional fields
   const isUpdate = hasUpdate && hasId && hasAdditionalFields
   // Has additional fields but not id
@@ -303,10 +355,8 @@ const buildObjectMutationData = ({
     return {}
   }
 
-  const { id, ...otherArgs } = inputArg
-
   let fields = buildReferenceField({
-    inputArg: isUpdate ? otherArgs : inputArg,
+    inputArg,
     previousInputArg,
     introspectionResults,
     parentTypeName,
@@ -350,13 +400,18 @@ const traverseVariables = (
   acc: any
 ): { where: Params, data: Params } => {
   // Put id field in a where object
-  if (key === 'id' && params.data[key]) {
-    return {
-      ...acc,
-      where: {
-        id: params.data[key]
-      }
-    };
+  if (key === 'id') {
+    if (params.data[key]) {
+      return {
+        ...acc,
+        where: {
+          id: params.data[key]
+        }
+      };
+    }
+
+    // Ignore when id is null or undefined
+    return acc
   }
 
   const currentInputField = findInputFieldForType(
@@ -458,18 +513,33 @@ const traverseVariables = (
       console.error('Both delete and disconnect operations exist for type: ' + currentType.name)
     }
 
-    if (hasDeleteOperation) {
+    if (hasDisconnectOperation) {
+      operations[PRISMA_DISCONNECT] = fieldsToDelete
+    }
+    else if (hasDeleteOperation) {
       operations[PRISMA_DELETE] = fieldsToDelete
     }
-    else if (hasDisconnectOperation) {
-      operations[PRISMA_DISCONNECT] = fieldsToDelete
+
+    const nonEmptyOperations = Object.entries(operations).reduce((acc, [operation, arr]) => {
+      if (!arr.length) {
+        return acc
+      }
+
+      return {
+        ...acc,
+        [operation]: arr
+      }
+    }, {})
+
+    if (!Object.keys(nonEmptyOperations).length) {
+      return acc
     }
 
     return {
       ...acc,
       data: {
         ...acc.data,
-        [key]: operations
+        [key]: nonEmptyOperations
       }
     };
   }

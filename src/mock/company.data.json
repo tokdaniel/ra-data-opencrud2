@@ -1,0 +1,232 @@
+{
+  "id": "ck7usjgdg00gf0895zz3oqzd2",
+  "data": {
+    "id": "ck7usjgdg00gf0895zz3oqzd2",
+    "createdAt": "2020-03-16T18:18:00.475Z",
+    "updatedAt": "2020-04-24T08:43:56.759Z",
+    "title": "test",
+    "friendlyURL": "asd",
+    "subtitle": null,
+    "description": "adasd ca",
+    "type.id": "ck7usgba400cr08950ii9muxo",
+    "type": {
+      "id": "ck7usgba400cr08950ii9muxo"
+    },
+    "logo": null,
+    "mainVideo": null,
+    "instagramProfile": null,
+    "facebookProfile": null,
+    "linkedinProfile": null,
+    "isPublished": false,
+    "activeFrom": "2020-03-16T00:00:00.000Z",
+    "activeTo": "2020-03-30T00:00:00.000Z",
+    "city": null,
+    "zip": null,
+    "street": null,
+    "phone": null,
+    "email": null,
+    "videos": [
+      {
+        "id": "ck7uuassp00h80895m9262qua",
+        "createdAt": "2020-03-16T19:07:15.862Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "video": "https://comity.s3.eu-central-1.amazonaws.com/2e231ea6-bc47-4aad-9206-ee5720335b4f.mp4",
+        "coverImage": "https://comity.s3.eu-central-1.amazonaws.com/7dc1a74d-6806-4b40-8c63-3d0963c32cae.png",
+        "title": "asd",
+        "priority": 1,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        }
+      }
+    ],
+    "videosIds": [
+      "ck7uuassp00h80895m9262qua"
+    ],
+    "positions": [
+      {
+        "id": "ck9dx6h6d00560895apqfjug7",
+        "createdAt": "2020-04-24T08:15:12.747Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "title": "sy",
+        "description": null,
+        "requirements": null,
+        "skills": [],
+        "skillsIds": [],
+        "activeFrom": null,
+        "activeTo": null,
+        "applyURL": null,
+        "hrPerson.id": "ck9dx63ll00460895sy5840zj",
+        "hrPerson": {
+          "id": ""
+        },
+        "contractTypes": [],
+        "contractTypesIds": [],
+        "priority": 1,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        },
+        "location": null
+      }
+    ],
+    "positionsIds": [
+      "ck9dx6h6d00560895apqfjug7"
+    ],
+    "images": [],
+    "events": [],
+    "colleagues": [
+      {
+        "id": "ck9dx63ll00460895sy5840zj",
+        "createdAt": "2020-04-24T08:14:55.098Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "name": "Hajnal Benjámin",
+        "title": "ad",
+        "introduction": null,
+        "opinion": null,
+        "image": null,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        },
+        "hr": true,
+        "isHidden": false
+      }
+    ],
+    "colleaguesIds": [
+      "ck9dx63ll00460895sy5840zj"
+    ],
+    "website": null,
+    "headerImage": null,
+    "mainVideoCover": null,
+    "benefitDescription": null,
+    "benefits": [],
+    "benefitsIds": [],
+    "careerSteps": [],
+    "sector.id": "ck7usgbf200ea089573ujdixi",
+    "sector": {
+      "id": "ck7usgbf200ea089573ujdixi"
+    },
+    "hiringSteps": [],
+    "colleaguesCount": null,
+    "positionImage": null,
+    "referenceLogo": null,
+    "isReference": false,
+    "benefitCombinations": []
+  },
+  "previousData": {
+    "id": "ck7usjgdg00gf0895zz3oqzd2",
+    "createdAt": "2020-03-16T18:18:00.475Z",
+    "updatedAt": "2020-04-24T08:43:56.759Z",
+    "title": "test",
+    "friendlyURL": "asd",
+    "subtitle": null,
+    "description": "adasd ca",
+    "type.id": "ck7usgba400cr08950ii9muxo",
+    "type": {
+      "id": "ck7usgba400cr08950ii9muxo",
+      "name": "Közszféra"
+    },
+    "logo": null,
+    "mainVideo": null,
+    "instagramProfile": null,
+    "facebookProfile": null,
+    "linkedinProfile": null,
+    "isPublished": false,
+    "activeFrom": "2020-03-16T00:00:00.000Z",
+    "activeTo": "2020-03-30T00:00:00.000Z",
+    "city": null,
+    "zip": null,
+    "street": null,
+    "phone": null,
+    "email": null,
+    "videos": [
+      {
+        "id": "ck7uuassp00h80895m9262qua",
+        "createdAt": "2020-03-16T19:07:15.862Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "video": "https://comity.s3.eu-central-1.amazonaws.com/2e231ea6-bc47-4aad-9206-ee5720335b4f.mp4",
+        "coverImage": "https://comity.s3.eu-central-1.amazonaws.com/7dc1a74d-6806-4b40-8c63-3d0963c32cae.png",
+        "title": "asd",
+        "priority": 1,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        }
+      }
+    ],
+    "videosIds": [
+      "ck7uuassp00h80895m9262qua"
+    ],
+    "positions": [
+      {
+        "id": "ck9dx6h6d00560895apqfjug7",
+        "createdAt": "2020-04-24T08:15:12.747Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "title": "sy",
+        "description": null,
+        "requirements": null,
+        "skills": [],
+        "skillsIds": [],
+        "activeFrom": null,
+        "activeTo": null,
+        "applyURL": null,
+        "hrPerson.id": "ck9dx63ll00460895sy5840zj",
+        "hrPerson": {
+          "id": "ck9dx63ll00460895sy5840zj"
+        },
+        "contractTypes": [],
+        "contractTypesIds": [],
+        "priority": 1,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        },
+        "location": null
+      }
+    ],
+    "positionsIds": [
+      "ck9dx6h6d00560895apqfjug7"
+    ],
+    "images": [],
+    "events": [],
+    "colleagues": [
+      {
+        "id": "ck9dx63ll00460895sy5840zj",
+        "createdAt": "2020-04-24T08:14:55.098Z",
+        "updatedAt": "2020-04-24T08:43:56.760Z",
+        "name": "Hajnal Benjámin",
+        "title": "ad",
+        "introduction": null,
+        "opinion": null,
+        "image": null,
+        "company.id": "ck7usjgdg00gf0895zz3oqzd2",
+        "company": {
+          "id": "ck7usjgdg00gf0895zz3oqzd2"
+        },
+        "hr": true,
+        "isHidden": false
+      }
+    ],
+    "colleaguesIds": [
+      "ck9dx63ll00460895sy5840zj"
+    ],
+    "website": null,
+    "headerImage": null,
+    "mainVideoCover": null,
+    "benefitDescription": null,
+    "benefits": [],
+    "benefitsIds": [],
+    "careerSteps": [],
+    "sector.id": "ck7usgbf200ea089573ujdixi",
+    "sector": {
+      "id": "ck7usgbf200ea089573ujdixi",
+      "name": "SSC"
+    },
+    "hiringSteps": [],
+    "colleaguesCount": null,
+    "positionImage": null,
+    "referenceLogo": null,
+    "isReference": false
+  }
+}

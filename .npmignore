@@ -1,3 +1,7 @@
 examples/
 .idea/
 node_modules/
+src/
+coverage/
+jest.config.js
+.vscode/

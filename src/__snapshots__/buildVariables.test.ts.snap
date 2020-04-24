@@ -1,0 +1,181 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`buildVariables UPDATE returns correct variables 1 1`] = `
+Object {
+  "data": Object {
+    "body": null,
+    "friendlyUrl": "/fooldal",
+    "head": null,
+    "layout": Object {
+      "update": Object {
+        "components": Object {
+          "create": Array [
+            Object {
+              "column": 1,
+              "config": Object {
+                "tagIds": Array [
+                  "ck8do5q940cxg0895uz7nv4nc",
+                ],
+                "title": "Legutóbbi mérkőzés",
+              },
+              "order": 1,
+              "row": 1,
+              "type": "RecentEvents",
+            },
+          ],
+          "disconnect": Array [
+            Object {
+              "id": "ck8e6tz3i02mj0895qihm44wu",
+            },
+          ],
+          "update": Array [
+            Object {
+              "data": Object {
+                "column": 0,
+                "config": Object {
+                  "tagIds": Array [
+                    "ck8do5q940cxg0895uz7nv4nc",
+                  ],
+                  "title": "Következő mérkőzés",
+                  "upcoming": true,
+                },
+                "order": 1,
+                "row": 1,
+                "type": "RecentEvents",
+              },
+              "where": Object {
+                "id": "ck8e6tz3d02mh08952ti9bmmi",
+              },
+            },
+          ],
+        },
+        "layout": Array [
+          Array [
+            "100",
+          ],
+          Array [
+            "50",
+            "50",
+          ],
+          Array [
+            "100",
+          ],
+          Array [
+            "50",
+            "50",
+          ],
+          Array [
+            "100",
+          ],
+        ],
+      },
+    },
+    "title": "Főoldal",
+  },
+  "where": Object {
+    "id": "ck8dozuea0dgi0895qgr4o5ed",
+  },
+}
+`;
+
+exports[`buildVariables UPDATE returns correct variables 2 1`] = `
+Object {
+  "data": Object {
+    "activeFrom": "2020-03-16T00:00:00.000Z",
+    "activeTo": "2020-03-30T00:00:00.000Z",
+    "benefitDescription": null,
+    "city": null,
+    "colleagues": Object {
+      "update": Array [
+        Object {
+          "data": Object {
+            "hr": true,
+            "image": null,
+            "introduction": null,
+            "isHidden": false,
+            "name": "Hajnal Benjámin",
+            "opinion": null,
+            "title": "ad",
+          },
+          "where": Object {
+            "id": "ck9dx63ll00460895sy5840zj",
+          },
+        },
+      ],
+    },
+    "colleaguesCount": null,
+    "description": "adasd ca",
+    "email": null,
+    "facebookProfile": null,
+    "friendlyURL": "asd",
+    "headerImage": null,
+    "instagramProfile": null,
+    "isPublished": false,
+    "isReference": false,
+    "linkedinProfile": null,
+    "logo": null,
+    "mainVideo": null,
+    "mainVideoCover": null,
+    "phone": null,
+    "positionImage": null,
+    "positions": Object {
+      "update": Array [
+        Object {
+          "data": Object {
+            "activeFrom": null,
+            "activeTo": null,
+            "applyURL": null,
+            "description": null,
+            "hrPerson": Object {
+              "disconnect": Object {
+                "id": "ck9dx63ll00460895sy5840zj",
+              },
+            },
+            "location": null,
+            "priority": 1,
+            "requirements": null,
+            "title": "sy",
+          },
+          "where": Object {
+            "id": "ck9dx6h6d00560895apqfjug7",
+          },
+        },
+      ],
+    },
+    "referenceLogo": null,
+    "sector": Object {
+      "connect": Object {
+        "id": "ck7usgbf200ea089573ujdixi",
+      },
+    },
+    "street": null,
+    "subtitle": null,
+    "title": "test",
+    "type": Object {
+      "connect": Object {
+        "id": "ck7usgba400cr08950ii9muxo",
+      },
+    },
+    "videos": Object {
+      "update": Array [
+        Object {
+          "data": Object {
+            "coverImage": "https://comity.s3.eu-central-1.amazonaws.com/7dc1a74d-6806-4b40-8c63-3d0963c32cae.png",
+            "priority": 1,
+            "title": "asd",
+            "video": "https://comity.s3.eu-central-1.amazonaws.com/2e231ea6-bc47-4aad-9206-ee5720335b4f.mp4",
+          },
+          "where": Object {
+            "id": "ck7uuassp00h80895m9262qua",
+          },
+        },
+      ],
+    },
+    "website": null,
+    "zip": null,
+  },
+  "where": Object {
+    "id": "ck7usjgdg00gf0895zz3oqzd2",
+  },
+}
+`;

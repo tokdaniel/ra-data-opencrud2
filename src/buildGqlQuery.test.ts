@@ -260,8 +260,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           GET_LIST,
           queryType as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -270,9 +269,6 @@ describe('buildGqlQuery', () => {
     foo
     linked {
       foo
-    }
-    resource {
-      id
     }
   }
   total: commandsConnection(foo: $foo) {
@@ -291,8 +287,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           GET_MANY,
           queryType as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -322,8 +317,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           GET_MANY_REFERENCE,
           queryType as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -353,8 +347,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           GET_ONE,
           { ...queryType, name: 'getCommand' } as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -363,9 +356,6 @@ describe('buildGqlQuery', () => {
     foo
     linked {
       foo
-    }
-    resource {
-      id
     }
   }
 }
@@ -379,8 +369,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           UPDATE,
           { ...queryType, name: 'updateCommand' } as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -405,8 +394,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           CREATE,
           { ...queryType, name: 'createCommand' } as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(
@@ -431,8 +419,7 @@ describe('buildGqlQuery', () => {
           resource as unknown as Resource,
           DELETE,
           { ...queryType, name: 'deleteCommand' } as Query,
-          params,
-          {} as DocumentNode
+          params
         )
       )
     ).toEqual(

@@ -53,35 +53,43 @@ export default (options: {
         resource: string,
         params: { [key: string]: any }
       ): Promise<any> => {
-        // Temporary work-around until we make use of updateMany and deleteMany mutations
-        if (fetchType === DELETE_MANY) {
-          const { ids, ...otherParams } = params;
-          return Promise.all(
-            params.ids.map((id: string) =>
-              graphQLDataProvider(DELETE, resource, {
-                id,
-                ...otherParams
-              })
-            )
-          ).then(results => {
-            return { data: results.map(({ data }: any) => data.id) };
-          });
-        }
+        try {
+          // Temporary work-around until we make use of updateMany and deleteMany mutations
+          if (fetchType === DELETE_MANY) {
+            const { ids, ...otherParams } = params;
+            return Promise.all(
+              params.ids.map((id: string) =>
+                graphQLDataProvider(DELETE, resource, {
+                  id,
+                  ...otherParams
+                })
+              )
+            ).then(results => {
+              return { data: results.map(({ data }: any) => data.id) };
+            });
+          }
 
-        if (fetchType === UPDATE_MANY) {
-          const { ids, ...otherParams } = params;
-          return Promise.all(
-            params.ids.map((id: string) =>
-              graphQLDataProvider(UPDATE, resource, {
-                id,
-                ...otherParams
-              })
-            )
-          ).then(results => {
-            return { data: results.map(({ data }: any) => data.id) };
-          });
+          if (fetchType === UPDATE_MANY) {
+            const { ids, ...otherParams } = params;
+            return Promise.all(
+              params.ids.map((id: string) =>
+                graphQLDataProvider(UPDATE, resource, {
+                  id,
+                  ...otherParams
+                })
+              )
+            ).then(results => {
+              return { data: results.map(({ data }: any) => data.id) };
+            });
+          }
+
+          return graphQLDataProvider(fetchType, resource, params);
         }
-        return graphQLDataProvider(fetchType, resource, params);
+        catch (err) {
+          console.error(err)
+
+          throw err
+        }
       };
     }
   );

@@ -20,7 +20,7 @@ describe('buildQuery', () => {
         {} as any
       )
     ).toThrow(
-      'Unknown resource Comment. Make sure it has been declared on your server side schema. Known resources are Post'
+      'Unknown resource Comment. Make sure it has been declared on your server side schema. Known resources are: Post'
     );
   });
 

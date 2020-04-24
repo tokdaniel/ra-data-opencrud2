@@ -1,0 +1,146 @@
+{
+  "id": "ck8dozuea0dgi0895qgr4o5ed",
+  "data": {
+    "id": "ck8dozuea0dgi0895qgr4o5ed",
+    "createdAt": "2020-03-29T23:46:24.033Z",
+    "updatedAt": "2020-03-30T08:05:43.265Z",
+    "title": "Főoldal",
+    "head": null,
+    "body": null,
+    "friendlyUrl": "/fooldal",
+    "layout": {
+      "id": "ck8e6tz3c02mg0895uw5lq4cr",
+      "layout": [
+        [
+          "100"
+        ],
+        [
+          "50",
+          "50"
+        ],
+        [
+          "100"
+        ],
+        [
+          "50",
+          "50"
+        ],
+        [
+          "100"
+        ]
+      ],
+      "components": [
+        {
+          "id": "ck8e6tz3d02mh08952ti9bmmi",
+          "createdAt": "2020-03-30T08:05:43.265Z",
+          "updatedAt": "2020-03-30T08:05:43.265Z",
+          "type": "RecentEvents",
+          "row": 1,
+          "column": 0,
+          "order": 1,
+          "config": {
+            "tagIds": [
+              "ck8do5q940cxg0895uz7nv4nc"
+            ],
+            "upcoming": true,
+            "title": "Következő mérkőzés"
+          },
+          "__typename": "Component"
+        },
+        {
+          "id": null,
+          "createdAt": "2020-03-30T08:05:43.267Z",
+          "updatedAt": "2020-03-30T08:05:43.267Z",
+          "type": "RecentEvents",
+          "row": 1,
+          "column": 1,
+          "order": 1,
+          "config": {
+            "tagIds": [
+              "ck8do5q940cxg0895uz7nv4nc"
+            ],
+            "title": "Legutóbbi mérkőzés"
+          },
+          "__typename": "Component"
+        }
+      ]
+    },
+    "publicationSettings": [],
+    "publicationSettingsIds": [],
+    "author": {
+      "id": "ck8do5q7l0cwr0895ezu4s5nr"
+    }
+  },
+  "previousData": {
+    "id": "ck8dozuea0dgi0895qgr4o5ed",
+    "createdAt": "2020-03-29T23:46:24.033Z",
+    "updatedAt": "2020-03-30T08:05:43.265Z",
+    "title": "Főoldal",
+    "head": null,
+    "body": null,
+    "friendlyUrl": "/fooldal",
+    "layout": {
+      "id": "ck8e6tz3c02mg0895uw5lq4cr",
+      "createdAt": "2020-03-30T08:05:43.265Z",
+      "updatedAt": "2020-03-30T08:05:43.265Z",
+      "layout": [
+        [
+          "100"
+        ],
+        [
+          "50",
+          "50"
+        ],
+        [
+          "100"
+        ],
+        [
+          "50",
+          "50"
+        ],
+        [
+          "100"
+        ]
+      ],
+      "components": [
+        {
+          "id": "ck8e6tz3d02mh08952ti9bmmi",
+          "createdAt": "2020-03-30T08:05:43.265Z",
+          "updatedAt": "2020-03-30T08:05:43.265Z",
+          "type": "RecentEvents",
+          "row": 1,
+          "column": 0,
+          "order": 1,
+          "config": {
+            "tagIds": [
+              "ck8do5q940cxg0895uz7nv4nc"
+            ],
+            "upcoming": true,
+            "title": "Következő mérkőzés"
+          },
+          "__typename": "Component"
+        },
+        {
+          "id": "ck8e6tz3i02mj0895qihm44wu",
+          "createdAt": "2020-03-30T08:05:43.268Z",
+          "updatedAt": "2020-03-30T08:05:43.268Z",
+          "type": "TernaryNews",
+          "row": 2,
+          "column": 0,
+          "order": 1,
+          "config": {
+            "tagIds": [
+              "ck8do5qa10cxv0895y4u8etox",
+              "ck8do5q940cxg0895uz7nv4nc"
+            ],
+            "title": "Korábbi hírek"
+          },
+          "__typename": "Component"
+        }
+      ],
+      "__typename": "Layout"
+    },
+    "publicationSettings": [],
+    "publicationSettingsIds": []
+  }
+}
