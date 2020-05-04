@@ -127,9 +127,7 @@ Object {
             "applyURL": null,
             "description": null,
             "hrPerson": Object {
-              "disconnect": Object {
-                "id": "ck9dx63ll00460895sy5840zj",
-              },
+              "disconnect": true,
             },
             "location": null,
             "priority": 1,

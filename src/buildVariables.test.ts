@@ -11,7 +11,7 @@ import { TypeKind } from 'graphql/type/introspection';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 describe('buildVariables', () => {
-  describe.skip('GET_LIST', () => {
+  describe('GET_LIST', () => {
     it('returns correct variables', () => {
       const introspectionResult = {
         types: [
@@ -53,7 +53,7 @@ describe('buildVariables', () => {
     });
   });
 
-  describe.skip('CREATE', () => {
+  describe('CREATE', () => {
     it('returns correct variables', () => {
       const introspectionResult = {
         types: [
@@ -221,7 +221,7 @@ describe('buildVariables', () => {
     });
   });
 
-  describe.skip('GET_MANY', () => {
+  describe('GET_MANY', () => {
     it('returns correct variables', () => {
       const params = {
         ids: ['tag1', 'tag2']
@@ -239,7 +239,7 @@ describe('buildVariables', () => {
     });
   });
 
-  describe.skip('GET_MANY_REFERENCE', () => {
+  describe('GET_MANY_REFERENCE', () => {
     it('returns correct variables', () => {
       const params = {
         target: 'author.id',
@@ -258,7 +258,7 @@ describe('buildVariables', () => {
     });
   });
 
-  describe.skip('DELETE', () => {
+  describe('DELETE', () => {
     it('returns correct variables', () => {
       const params = {
         id: 'post1'

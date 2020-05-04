@@ -320,8 +320,17 @@ const buildObjectMutationData = ({
   const hasId = !!inputArg.id
   const hadId = !!previousInputArg.id
 
-  // We should delete/disconnect in case of empty id based on the previous data
-  if (!hasId && hadId) {
+  const hasAdditionalFields = Object.keys(inputArg).some(field => field !== 'id')
+
+  // Has id but doesnt have any additional fields
+  const isConnect = hasConnect && hasId && (!hasAdditionalFields || (!hasCreate && !hasUpdate))
+  // Has id and additional fields
+  const isUpdate = hasUpdate && hasId && hasAdditionalFields
+  // Has additional fields but not id
+  const isCreate = hasCreate && !hasId && hasAdditionalFields
+
+  // We should delete/disconnect in case of empty id based on the previous data, or if it has additional fields then do a create operation
+  if (!hasId && hadId && !isCreate) {
     // Prefer disconnect over delete
     const mutationType = hasDisconnect ? PRISMA_DISCONNECT : hasDelete ? PRISMA_DELETE : null
 
@@ -331,21 +340,10 @@ const buildObjectMutationData = ({
 
     return {
       [key]: {
-        [mutationType]: {
-          id: previousInputArg.id
-        }
+        [mutationType]: true
       }
     };
   }
-
-  const hasAdditionalFields = Object.keys(inputArg).some(field => field !== 'id')
-
-  // Has id but doesnt have any additional fields
-  const isConnect = hasConnect && hasId && (!hasAdditionalFields || (!hasCreate && !hasUpdate))
-  // Has id and additional fields
-  const isUpdate = hasUpdate && hasId && hasAdditionalFields
-  // Has additional fields but not id
-  const isCreate = hasCreate && !hasId && hasAdditionalFields
 
   const mutationType =
     [PRISMA_CONNECT, PRISMA_UPDATE, PRISMA_CREATE]
