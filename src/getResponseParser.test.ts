@@ -6,7 +6,7 @@ import {
   CREATE,
   UPDATE,
   DELETE
-} from 'ra-core/lib/dataFetchActions';
+} from 'ra-core/lib/core/dataFetchActions';
 import getResponseParser from './getResponseParser';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 

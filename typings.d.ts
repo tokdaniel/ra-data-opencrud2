@@ -1,3 +1,5 @@
+declare module 'ra-core/lib/core/dataFetchActions'
+
 declare module 'ra-data-graphql' {
   export const QUERY_TYPES: string[];
   type graphQLDataProvider = (
